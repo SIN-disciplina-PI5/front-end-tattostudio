@@ -1,59 +1,142 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { withLayoutContext } from 'expo-router';
+import { IconButton } from 'react-native-paper';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+const { Navigator } = createMaterialTopTabNavigator();
+const MaterialTopTabs = withLayoutContext(Navigator);
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+function MyCustomTabBar({ state, descriptors, navigation }: any) {
+  return (
+    <View style={styles.tabBarContainer}>
+      {/* Header com Olá e Ícone de Perfil */}
+      <View style={styles.headerRow}>
+        <Text style={styles.greeting}>Olá, João</Text>
+        <TouchableOpacity style={styles.profileButton}>
+           <IconButton icon="account-outline" iconColor="#FFF" size={28} style={styles.profileIcon} />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.mainTitle}>Escolha seu estilo</Text>
+
+      {/* Navegação Estilizada (Cápsula na ativa) */}
+      <View style={styles.linksRow}>
+        {state.routes.map((route: any, index: number) => {
+          const { options } = descriptors[route.key];
+          
+          const allowed = ['index', 'piercings', 'joias', 'artes'];
+          if (!allowed.includes(route.name)) return null;
+
+          const label = options.title !== undefined ? options.title : route.name;
+          const isFocused = state.index === index;
+
+          return (
+            <React.Fragment key={route.key}>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate(route.name)}
+                style={[styles.tabItem, isFocused && styles.tabItemActive]}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.tabText, isFocused ? styles.tabTextActive : styles.tabTextInactive]}>
+                  {label}
+                </Text>
+              </TouchableOpacity>
+              
+              {/* Divisor vertical centralizado entre as abas */}
+              {index < 3 && <Text style={styles.divider}>|</Text>}
+            </React.Fragment>
+          );
+        })}
+      </View>
+    </View>
+  );
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0A0A0A' }}>
+      <StatusBar barStyle="light-content" />
+      <MaterialTopTabs
+        tabBar={(props) => <MyCustomTabBar {...props} />}
+        screenOptions={{
+          swipeEnabled: true,
         }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <MaterialTopTabs.Screen name="index" options={{ title: 'Tatuagens' }} />
+        <MaterialTopTabs.Screen name="piercings" options={{ title: 'Piercings' }} />
+        <MaterialTopTabs.Screen name="joias" options={{ title: 'Joias' }} />
+        <MaterialTopTabs.Screen name="artes" options={{ title: 'Artes' }} />
+      </MaterialTopTabs>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBarContainer: {
+    backgroundColor: '#0A0A0A',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 5,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  greeting: { 
+    color: '#FFF', 
+    fontSize: 26, 
+    fontWeight: '300',
+    letterSpacing: 0.5
+  },
+  profileButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: '#444',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1A1A1A'
+  },
+  profileIcon: {
+    margin: 0,
+  },
+  mainTitle: { 
+    color: '#FFF', 
+    fontSize: 34, 
+    fontWeight: 'bold', 
+    marginBottom: 25 
+  },
+  linksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  tabItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 15,
+  },
+  tabItemActive: {
+    backgroundColor: '#1A1A1B', // Cor do fundo arredondado da aba ativa
+  },
+  tabText: { 
+    fontSize: 18,
+  },
+  tabTextActive: { 
+    color: '#FFF', 
+    fontWeight: '500' 
+  },
+  tabTextInactive: { 
+    color: '#888' 
+  },
+  divider: { 
+    color: '#333', 
+    marginHorizontal: 4, 
+    fontSize: 20,
+    fontWeight: '200'
+  }
+});

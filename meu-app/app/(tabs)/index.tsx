@@ -2,54 +2,65 @@ import React from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Card, IconButton } from 'react-native-paper';
 
-export default function TatuagensScreen() {
-  // Simulação de dados das tatuagens
-  const tatuagens = [1, 2, 3, 4, 5];
+// Como o React Native exige que o require seja estático, 
+// você deve listar suas imagens aqui conforme for adicionando-as na pasta.
+const tatuagemImagens = [
+  // Exemplo de como usar quando tiver as fotos: 
+  // require('../../assets/images/tatuagens/foto1.png'), 
+  null, // Slot 1 (Vazio -> Fundo Cinza)
+  null, // Slot 2
+  null, // Slot 3
+  null, // Slot 4
+  null, // Slot 5
+];
 
+export default function TatuagensScreen() {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         
-        {/* Grid de Estilos */}
+        {/* Grid de Portfólio */}
         <View style={styles.grid}>
-          {tatuagens.map((item) => (
-            <View key={item} style={styles.gridItem}>
-              <View style={styles.imageContainer}>
-                 <Image 
-                  source={{ uri: `https://picsum.photos/200/200?random=${item}` }} 
-                  style={styles.styleImage} 
-                />
+          {tatuagemImagens.map((img, index) => (
+            <View key={index} style={styles.gridItem}>
+              <View style={styles.imageBox}>
+                {img ? (
+                  <Image source={img} style={styles.img} />
+                ) : (
+                  /* Fundo cinza caso não tenha imagem carregada no array */
+                  <View style={styles.placeholder} />
+                )}
               </View>
-              <Text style={styles.styleLabel}>Ipsum</Text>
+              <Text style={styles.label}>Ipsum</Text>
             </View>
           ))}
           
-          {/* Item Personalizado */}
+          {/* Botão de Estilo Personalizado */}
           <View style={styles.gridItem}>
-            <View style={[styles.imageContainer, styles.customButton]}>
+            <TouchableOpacity style={[styles.imageBox, { backgroundColor: '#1A1A1A' }]}>
                <IconButton icon="pencil-outline" iconColor="#fff" size={30} />
-            </View>
-            <Text style={styles.styleLabel}>Personalizado</Text>
+            </TouchableOpacity>
+            <Text style={styles.label}>Personalizado</Text>
           </View>
         </View>
 
-        {/* Banner de Promoção */}
-        <Card style={styles.promoCard}>
-          <View style={styles.promoContent}>
-            <View style={styles.promoIconContainer}>
-               <IconButton icon="tag-outline" iconColor="#000" size={35} />
+        {/* Card de Promoção */}
+        <Card style={styles.card}>
+          <View style={styles.cardInfo}>
+            <View style={styles.iconTag}>
+               <IconButton icon="tag-outline" iconColor="#000" size={32} />
             </View>
-            <View style={styles.promoTextContainer}>
-              <Text style={styles.promoTitle}>Promoção do mês</Text>
-              <Text style={styles.promoSubtitle}>2 Tatuagens de até 10cm por R$80</Text>
-              <Text style={styles.promoDetails}>traços simples / preto e cinza</Text>
+            <View style={{ marginLeft: 15, flex: 1 }}>
+              <Text style={styles.cardTitle}>Promoção do mês</Text>
+              <Text style={styles.cardSub}>2 Tatuagens de até 10cm por R$80</Text>
+              <Text style={styles.cardDetail}>traços simples / preto e cinza</Text>
             </View>
           </View>
         </Card>
 
-        {/* Botão Realizar Agendamento */}
-        <TouchableOpacity style={styles.bookingButton} activeOpacity={0.8}>
-          <Text style={styles.bookingButtonText}>Realizar agendamento</Text>
+        {/* Botão de Agendamento */}
+        <TouchableOpacity style={styles.btn} activeOpacity={0.8}>
+          <Text style={styles.btnText}>Realizar agendamento</Text>
         </TouchableOpacity>
 
       </ScrollView>
@@ -63,7 +74,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#0A0A0A' 
   },
   content: { 
-    padding: 20 
+    paddingHorizontal: 20,
+    paddingTop: 10
   },
   grid: { 
     flexDirection: 'row', 
@@ -71,81 +83,79 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between' 
   },
   gridItem: { 
-    width: '30%', 
+    width: '31%', 
     alignItems: 'center', 
     marginBottom: 20 
   },
-  imageContainer: { 
+  imageBox: { 
     width: '100%', 
     aspectRatio: 1, 
     borderRadius: 20, 
-    backgroundColor: '#1A1A1A', 
+    backgroundColor: '#222', // Fundo cinza solicitado
     borderWidth: 1, 
-    borderColor: '#333', 
-    justifyContent: 'center', 
-    alignItems: 'center',
-    overflow: 'hidden'
+    borderColor: '#333',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  styleImage: { 
+  placeholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#222', 
+  },
+  img: { 
     width: '100%', 
     height: '100%' 
   },
-  styleLabel: { 
+  label: { 
     color: '#FFF', 
     marginTop: 8, 
-    fontSize: 12, 
+    fontSize: 12,
     fontWeight: '500' 
   },
-  customButton: { 
-    backgroundColor: '#1A1A1A' 
-  },
-  promoCard: { 
+  card: { 
     backgroundColor: '#1A1A1A', 
     borderRadius: 25, 
     marginTop: 10, 
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#333'
+    padding: 15, 
+    borderWidth: 1, 
+    borderColor: '#333',
+    elevation: 0
   },
-  promoContent: { 
+  cardInfo: { 
     flexDirection: 'row', 
     alignItems: 'center' 
   },
-  promoIconContainer: { 
+  iconTag: { 
     backgroundColor: '#FFF', 
-    borderRadius: 15, 
-    padding: 0 
+    borderRadius: 15 
   },
-  promoTextContainer: { 
-    marginLeft: 15, 
-    flex: 1 
-  },
-  promoTitle: { 
+  cardTitle: { 
     color: '#FFF', 
     fontSize: 20, 
     fontWeight: 'bold' 
   },
-  promoSubtitle: { 
+  cardSub: { 
     color: '#FFF', 
     fontSize: 13, 
     marginTop: 2 
   },
-  promoDetails: { 
-    color: '#888', 
+  cardDetail: { 
+    color: '#777', 
     fontSize: 11 
   },
-  bookingButton: { 
+  btn: { 
     backgroundColor: '#1C1C1E', 
     height: 60, 
-    borderRadius: 18, 
+    borderRadius: 20, 
     justifyContent: 'center', 
     alignItems: 'center', 
     marginTop: 30, 
-    marginBottom: 40,
+    marginBottom: 50,
     borderWidth: 1, 
     borderColor: '#333' 
   },
-  bookingButtonText: { 
+  btnText: { 
     color: '#FFF', 
     fontSize: 16, 
     fontWeight: 'bold' 
